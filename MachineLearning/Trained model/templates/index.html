@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Disease Classifier</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background:  #6cb1da;
+            color: #333;
+        }
+        
+        .container {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #222;
+        }
+        
+        input[type="file"] {
+            margin: 15px 0;
+            padding: 12px;
+            border: 2px dashed #3498db;
+            background: #f8f8f8;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 6px;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+        
+        button:hover {
+            background: #217dbb;
+        }
+        
+        #preview {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        #result-container {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: left;
+        }
+        
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #222;
+            text-align: center;
+        }
+        
+        .disease-info {
+            font-size: 14px;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+        
+        #how-it-works {
+            margin-top: 40px;
+            padding: 30px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 700px;
+            width: 90%;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        
+        #how-it-works h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 20px;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        @media (min-width: 600px) {
+            .steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .step {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: 0.3s ease-in-out;
+        }
+        
+        .step:hover {
+            transform: translateY(-5px);
+            background: #e3f2fd;
+        }
+        
+        .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background:   #34729c;;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+        
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+          
+        }
+        
+        .nav-links li {
+            display: inline;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            padding: 8px 12px;
+            transition: 0.3s ease-in-out;
+            border-radius: 5px;
+        }
+        
+        .nav-links a:hover {
+            background: #6ec1d1;
+            color: #fff;
+        }
+        
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                right: 10px;
+                background: #34729c;
+                padding: 15px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            }
+        
+            .nav-links.active {
+                display: flex;
+            }
+        }
+        
+        .hero {
+            background: #6cb1da;
+            color: white;
+            text-align: center;
+            padding: 80px 20px;
+            width: 100%;
+        }
+        
+        .hero h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .hero p {
+            font-size: 16px;
+            max-width: 600px;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+        
+        .hero-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #f1c40f;
+            color: black;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        
+        .hero-btn:hover {
+            background: #d4ac0d;
+        }
+    
+        .menu-toggle {
+                display: block;
+            }
+        
+        #result-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    
+        .result-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+    
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 400px;
+            margin: auto;
+            transition: 0.3s ease-in-out;
+        }
+    
+        .result-card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+    
+        .disease-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+    
+        .disease-details {
+            font-size: 16px;
+            color: #555;
+            text-align: left;
+            margin-top: 10px;
+        }
+    
+        /* Different colors for each disease */
+        .chickenpox { color: #e63946; }
+        .measles { color: #f77f00; }
+        .monkeypox { color: #ffba08; }
+        .normal { color: #2a9d8f; }
+    
+        /* Fade-in effect */
+        .result-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+    
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Footer Styles */
+        footer {
+            background-color: #1e5470;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .footer-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: auto;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #f8b400;
+        }
+        
+        .footer-section p, .footer-section ul {
+            font-size: 1rem;
+            color: #ddd;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-section ul li {
+            margin: 8px 0;
+        }
+        
+        .footer-section ul li a {
+            color: #f8b400;
+            text-decoration: none;
+        }
+        
+        .footer-bottom {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #111;
+            font-size: 0.9rem;
+        }
+        
+
+    </style>
+</head>
+<body>
+   <!-- Navigation Bar -->
+<nav class="navbar">
+    <div class="logo">SkinCare AI</div>
+    <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#upload">Upload</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+   
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>AI-Powered Skin Disease Detection</h1>
+        <p>Upload an image and get instant diagnosis for **Chickenpox, Measles, Monkeypox**, or normal skin conditions.</p>
+        <a href="#upload" class="hero-btn">Get Started</a>
+    </div>
+</section>
+<!-- Upload Section -->
+<div class="container" id="upload">
+    <h1>Upload an Image for Skin Disease Classification</h1>
+    <input type="file" id="imageUpload" accept="image/*">
+    <button onclick="uploadImage()">Classify</button>
+    
+    <div id="preview">
+        <img id="resultImage" src="" alt="Uploaded Image Preview" style="display: none;">
+    </div>
+
+    <div id="result-container" style="display: none;">
+        <h2 class="result-title">Diagnosis Result</h2>
+        <div class="result-card">
+            <img id="uploadedImage" src="" alt="Predicted Image">
+            <p id="prediction" class="disease-name"></p>
+            <div id="disease-info" class="disease-details"></div>
+        </div>
+    </div>
+</div>
+
+<div id="how-it-works">
+    <h2>🔍 How This Program Works</h2>
+    <div class="steps">
+        <div class="step">
+            <div class="icon">📸</div>
+            <h3>1. Upload an Image</h3>
+            <p>Users can upload a clear image of the affected skin area. The image should be in <strong>JPG, PNG, or JPEG format</strong>.</p>
+        </div>
+        <div class="step">
+            <div class="icon">🧠</div>
+            <h3>2. AI Model Analyzes</h3>
+            <p>Our <strong>TensorFlow Lite</strong> model processes the image, resizing it to <strong>224x224 pixels</strong> and extracting key features for classification.</p>
+        </div>
+        <div class="step">
+            <div class="icon">🔬</div>
+            <h3>3. Disease Detection</h3>
+            <p>The model compares patterns with a <strong>medical dataset</strong> to determine whether the skin condition is <strong>Chickenpox, Measles, Monkeypox, or Normal</strong>.</p>
+        </div>
+        <div class="step">
+            <div class="icon">📊</div>
+            <h3>4. Result & Treatment</h3>
+            <p>It displays the <strong>disease name, symptoms, and possible treatments</strong>, providing valuable guidance for further medical consultation.</p>
+        </div>
+    </div>
+</div>
+<!-- Footer Section -->
+<footer>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>About</h3>
+            <p>This AI-powered tool helps in detecting skin conditions like Chickenpox, Measles, and Monkeypox from images. It provides instant analysis and medical insights.</p>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="#upload">Upload Image</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Contact</h3>
+            <p>Email: support@skindetect.com</p>
+            <p>Phone: +123 456 7890</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2025 SkinDetect AI | All Rights Reserved.</p>
+    </div>
+</footer>
+
+
+<script>
+    function uploadImage() {
+        let fileInput = document.getElementById("imageUpload");
+        let file = fileInput.files[0];
+
+        if (!file) {
+            alert("Please select an image file.");
+            return;
+        }
+
+        // Show uploaded image preview
+        let previewImg = document.getElementById("resultImage");
+        previewImg.src = URL.createObjectURL(file);
+        previewImg.style.display = "block";
+
+        let formData = new FormData();
+        formData.append("file", file);
+
+        fetch("/predict", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                // Set the result image from server response
+                document.getElementById("uploadedImage").src = data.image_url || previewImg.src;
+                document.getElementById("result-container").style.display = "block";
+
+                let diseaseInfo = {
+                    "Chickenpox": {
+                        name: "🔴 Chickenpox",
+                        description: "A contagious viral infection causing an itchy rash and red spots.",
+                        treatment: "💊 Rest, hydration, and antiviral medication if needed. Avoid scratching.",
+                        prevention: "🛡️ Chickenpox vaccine is highly effective."
+                    },
+                    "Measles": {
+                        name: "🟠 Measles",
+                        description: "A viral infection causing fever, cough, runny nose, and rash.",
+                        treatment: "💊 Supportive care, vitamin A, and hydration.",
+                        prevention: "🛡️ MMR vaccine protects against Measles, Mumps, and Rubella."
+                    },
+                    "Monkeypox": {
+                        name: "🟡 Monkeypox",
+                        description: "A rare viral infection causing fever, swollen lymph nodes, and skin rashes.",
+                        treatment: "💊 Symptomatic relief, isolation, and antiviral drugs if severe.",
+                        prevention: "🛡️ Avoid contact with infected animals or individuals."
+                    },
+                    "Normal": {
+                        name: "✅ Normal Skin Condition",
+                        description: "No signs of Chickenpox, Measles, or Monkeypox detected.",
+                        treatment: "😊 Keep skin clean and hydrated for optimal health.",
+                        prevention: "🛡️ Maintain a healthy diet and hygiene."
+                    }
+                };
+
+                let result = diseaseInfo[data.prediction];
+                document.getElementById("prediction").innerText = result.name;
+                document.getElementById("prediction").className = data.prediction.toLowerCase();
+                document.getElementById("disease-info").innerHTML = `
+                    <p><strong>Description:</strong> ${result.description}</p>
+                    <p><strong>Treatment:</strong> ${result.treatment}</p>
+                    <p><strong>Prevention:</strong> ${result.prevention}</p>
+                `;
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+</script>
+
+</body>
+</html>
